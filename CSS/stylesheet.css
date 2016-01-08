@@ -1,0 +1,98 @@
+@font-face {
+    font-family: Ubuntu Light;
+    src: url(Fonts/ubuntu-font-family-0.83/Ubuntu-L.ttf);
+}
+
+@font-face {
+    font-family: Ubuntu Medium;
+    src: url(Fonts/ubuntu-font-family-0.83/Ubuntu-M.ttf);
+}
+
+@font-face {
+    font-family: Ubuntu Bold;
+    src: url(Fonts/ubuntu-font-family-0.83/Ubuntu-B.ttf);
+}
+
+body {
+    background-color: #292341;
+	font-family: Ubuntu Light;
+}
+
+svg {
+    width: 100%;
+    height: auto;
+}
+
+.axis text {
+    fill: #FFFFFF;
+}
+
+.axis.x text {
+    font-size: 8px;
+}
+
+.axis.y text {
+    font-size: 11px;
+}
+
+.axis path, .axis line {
+	fill: none;
+	stroke: #AAAAAA;
+}
+
+.magnify {
+    font-size: 16px !important;
+}
+
+.bar rect.invisible {
+    display: none;
+}
+
+.steamAnth {
+	fill: #FC383D;
+}
+
+.steamBitu {
+    fill: #DF5459;
+}
+
+.petroleum {
+    fill: #C27174;
+}
+
+.LNG {
+    fill: #A58D90;
+}
+
+.hydroPump {
+    fill: #87AAAC;
+}
+
+.nuclear {
+    fill: #6AC6C8;
+}
+
+.group {
+    fill: #4DE3E3;
+}
+
+.newRenew {
+    fill: #30FFFF;
+}
+
+.index text.name {
+    fill: #000000;
+    font-family: Ubuntu Medium;
+    font-size: 20px;
+}
+
+.index g text.rate {
+    fill: #FFFFFF;
+    font-family: Ubuntu Medium;
+    font-size: 30px;
+    display: none;
+}
+
+.index .visible {
+    display: block !important;
+}

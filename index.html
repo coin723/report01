@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
+		<title></title>
+		<link type="text/css" rel="stylesheet" href="CSS/stylesheet.css" />
+		<script src="//d3js.org/d3.v3.min.js" charset="UTF-8"></script>
+	</head>
+	<body>
+		<script>
+            function resetRects(DOM, scale) {
+                d3.select(DOM)
+                    .attr("height", function(d) {
+                        return height - scale(d);
+                    })
+                    .attr("y", function(d) {
+                        return scale(d);
+                    });
+            };
+            
+			var margin = {top: 30, right: 50, bottom: null, left: 70};
+			var width, height;
+            
+            var innerWidth = window.innerWidth;
+            var innerHeight = window.innerHeight;
+
+            if(innerHeight * 16 / 9 < innerWidth) {
+                margin.bottom = innerHeight / 6;
+                width = innerHeight * 16 / 9 - margin.right - margin.left;
+                height = innerHeight - margin.top - margin.bottom;
+            } else {
+                margin.bottom = innerWidth * 9 / 16 / 6;
+                width = innerWidth - margin.right - margin.left;
+                height = innerWidth * 9 / 16 - margin.top - margin.bottom;
+            }
+            
+            var svg = d3.select("body")
+                .append("svg")
+                .attr("class", "canvas")
+//                .attr("width", width + margin.right + margin.left)
+//                .attr("height", height + margin.top + margin.bottom)
+                .attr("viewBox", function() {
+                    return "0 0 " + window.innerWidth + " " + window.innerHeight;
+                })
+//                .attr("preserveAspectRatio", "none")
+                .append("g")
+                .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+            
+			var xScale = d3.scale.ordinal()
+				.rangeBands([0, width], .3);
+
+			var yScale = d3.scale.linear()
+				.range([height, 0]);
+
+			d3.csv("report01.csv", function(csvData) {
+				csvData.forEach(function(d) {
+					Object.keys(d).forEach(function(element) {
+						d[element] = +d[element];
+					})
+				});
+
+				var dMax = d3.max(csvData, function(d) {
+						return d.total;
+					});
+                
+                var data_option = {
+                    year: false,
+                    steamAnth: true,
+                    steamAnthRate: false,
+                    steamBitu: true,
+                    steamBituRate: false,
+                    petroleum: true,
+                    petroleumRate: false,
+                    LNG: true,
+                    LNGRate: false,
+                    hydroPump: true,
+                    hydroPumpRate: false,
+                    nuclear: true,
+                    nuclearRate: false,
+                    group: true,
+                    groupRate: false,
+                    newRenew: true,
+                    newRenewRate: false,
+                    total: false
+                };
+                
+                var class_set = [];
+                Object.keys(data_option).forEach(function(element) {
+                    if(data_option[element]) {
+                        class_set.push(element);
+                    }
+                });
+                
+                var rate_set = [];
+                class_set.forEach(function(element) {
+                    rate_set.push(element + "Rate");
+                });
+                
+                var data_keys = Object.keys(csvData[0]);
+                
+				var data = d3.nest()
+					.key(function(d) {
+						return d.year;
+					})
+                    .rollup(function(leaves) {
+                        var rollup = [];
+                        data_keys.forEach(function(element) {
+                            if(data_option[element]) {
+                                rollup.push(leaves[0][element]);
+                            }
+                        });
+                        return rollup;
+                    })
+					.map(csvData, d3.map);
+                
+                var years = data.keys();
+                
+                var data_rate = d3.map();
+                
+                rate_set.forEach(function(rate, i) {
+                    var group = [];
+                    csvData.forEach(function(d, j) {
+                        group.push(d[rate]);
+                    });
+                    data_rate.set(rate, group);
+                });
+
+				xScale.domain(years);
+
+				yScale.domain([0, dMax]);
+
+				var xAxis = d3.svg.axis()
+					.scale(xScale)
+					.orient("bottom");
+
+				var yAxis = d3.svg.axis()
+					.scale(yScale)
+					.orient("left");
+
+				var xAxis_appended = svg.append("g")
+					.attr("class", "axis x")
+					.attr("transform", "translate(0, " + height + ")")
+					.call(xAxis);
+
+				var yAxis_appended = svg.append("g")
+					.attr("class", "axis y")
+					.call(yAxis);
+                
+                var xTicks = document.querySelectorAll("g.x g.tick");
+                
+                for(var i = 0; i < xTicks.length; i++) {
+                    var textElement = xTicks.item(i).querySelector("text");
+                    textElement.setAttribute("class", "y" + textElement.innerHTML);
+                }
+                
+				var g_bar = svg.selectAll(".bar")
+					.data(years)
+					.enter()
+					.append("g")
+					.attr("class", function(d) {
+                        return "bar y" + d;
+                    })
+                    .attr("transform", function(d) {
+                        return "translate(" + xScale(d) + ", 0)"
+                    });
+                
+				var rects = g_bar.selectAll("rect")
+                    .data(function(year) {
+                        var gottenData = data.get(year);
+                        return gottenData;
+                    })
+                    .enter()
+                    .append("rect")
+                    .attr("class", function(d, i) {
+                        return class_set[i];
+                    })
+					.attr("width", xScale.rangeBand())
+                    .attr("y", function(d, i) {
+                        var currentYear = d3.select(this.parentNode).data();
+                        var dataArray = data.get(currentYear);
+                        
+                        var result = yScale(d);
+                        switch(i) {
+                            case 0:
+                                break;
+                            default:
+                                for(var j = 0; j < i; j++) {
+                                    result -= height - yScale(dataArray[j]);
+                                }
+                                break;
+                        }
+                        return result;
+                    })
+					.attr("height", function(d) {
+                        return height - yScale(d);
+                    });
+                
+                var indexWidth = width / class_set.length;
+                
+                var rate_name = ["무연탄", "유연탄", "석유", "LNG", "양수", "원자력", "집단", "신재생"];
+                
+                var rects_index = d3.select(".canvas")
+                    .append("g")
+                    .attr("class", "indices")
+                    .attr("transform", "translate(" + margin.left + ", " + (height + margin.top + 30) + ")")
+                    .selectAll(".index")
+                    .data(rate_set)
+                    .enter()
+                    .append("g")
+                    .attr("class", function(d, i) {
+                        return class_set[i] + " index";
+                    })
+                    .attr("transform", function(d, i) {
+                        return "translate(" + indexWidth * i + ", 0)";
+                    });
+                
+                rects_index.append("rect")
+                    .attr("width", indexWidth)
+                    .attr("height", margin.bottom);
+                
+                rects_index.append("text")
+                    .attr("class", "name")
+                    .text(function(d, i) {
+                        return rate_name[i];
+                    })
+                    .attr("dy", 20);
+                
+                var text_g = rects_index.append("g")
+                    .attr("class", function(d) {
+                        return d;
+                    })
+                    .selectAll("g")
+                    .data(function(rate) {
+                        var gottenData = data_rate.get(rate);
+                        return gottenData;
+                    })
+                    .enter()
+                    .append("g");
+                
+                text_g.append("text")
+                    .attr("class", function(d, i) {
+                        return "rate y" + years[i];
+                    })
+                    .text(function(d, i) {
+                        return d + "%"
+                    })
+                    .attr("y", margin.bottom)
+                    .attr("dy", -33)
+                    .attr("dx", indexWidth)
+                    .attr("text-anchor", "end");
+                
+                rects.on("mouseover", function(d) {
+                        var currentYear = d3.select(this.parentNode).data();
+                    
+                        var selector = ".index text.y" + currentYear;
+
+//                        var otherVisible = document.querySelectorAll("text.visible");
+//
+//                        for(var i = 0; i < otherVisible.length; i++) {
+//                            otherVisible.item(i).classList.toggle("visible");
+//                        }
+
+                        var texts = document.querySelectorAll(selector);
+
+                        for(var i = 0; i < texts.length; i++) {
+                            texts.item(i).classList.toggle("visible");
+                        }
+                        
+                        document.querySelector("g.x g.tick .y" + currentYear).classList.toggle("magnify");
+                    })
+                    .on("mouseout", function(d) {
+                        var currentYear = d3.select(this.parentNode).data();
+                    
+                        var otherVisible = document.querySelectorAll("text.visible");
+
+                        for(var i = 0; i < otherVisible.length; i++) {
+                            otherVisible.item(i).classList.toggle("visible");
+                        }
+                    
+                        document.querySelector("g.x g.tick .y" + currentYear).classList.toggle("magnify");
+                    });
+                
+                var bar_rects = d3.selectAll(".bar rect");
+                
+                var indexObj = {
+                    steamAnth: 0,
+                    steamBitu: 1,
+                    petroleum: 2,
+                    LNG: 3,
+                    hydroPump: 4,
+                    nuclear: 5,
+                    group: 6,
+                    newRenew: 7
+                };
+                
+                rects_index.on("mouseover", function(d) {
+                        var selector = this.classList.item(0);
+                    
+                        var tempMax = d3.max(csvData, function(d) {
+                            return d[selector];
+                        });
+                    
+                        yScale.domain([0, dMax]);
+                    
+                        var yAxis_temp = d3.svg.axis()
+                            .scale(yScale)
+                            .orient("left");
+                        
+                        yAxis_appended.call(yAxis_temp);
+                    
+                        bar_rects.each(function(d, i) {
+                                var classList = this.classList;
+                                
+                                if(classList.contains(selector)) {
+                                    classList.remove("invisible");
+                                    
+                                    d3.select(this)
+                                        .attr("height", function(d) {
+                                            return height - yScale(d);
+                                        })
+                                        .attr("y", function(d) {
+                                            return yScale(d);
+                                        });
+                                } else {
+                                    classList.add("invisible");
+                                }
+                            
+//                                if(!classList.contains(selector) && !classList.contains("invisible")) {
+//                                    classList.add("invisible");
+//                                }
+                            });
+                        
+                        
+                    })
+                    .on("mouseout", function(d) {
+                        var selector = this.classList.item(0);
+                        
+                        yScale.domain([0, dMax]);
+                    
+                        yAxis_appended.call(yAxis);
+                        
+                        bar_rects.each(function(d, i) {
+                                var classList = this.classList;
+                            
+                                if(classList.contains(selector)) {
+                                    d3.select(this)
+                                        .attr("height", function(d) {
+                                            return height - yScale(d);
+                                        })
+                                        .attr("y", function(d, i) {
+                                            var indexNum = indexObj[selector];
+                                        
+                                            var currentYear = d3.select(this.parentNode).data();
+                                            var dataArray = data.get(currentYear);
+
+                                            var result = yScale(d);
+                                            switch(indexNum) {
+                                                case 0:
+                                                    break;
+                                                default:
+                                                    for(var j = 0; j < indexNum; j++) {
+                                                        result -= height - yScale(dataArray[j]);
+                                                    }
+                                                    break;
+                                            }
+                                        
+                                            return result;
+                                        });
+                                }
+                            
+                                this.classList.remove("invisible");
+                            });
+                    });
+			});
+		</script>
+	</body>
+</html>
