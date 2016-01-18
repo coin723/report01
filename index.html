@@ -372,6 +372,16 @@
                                 this.classList.remove("invisible");
                             });
                     });
+                
+//                var partition = (xScale(2015) + xScale(2016)) / 2;
+                var partition = xScale(2016) - xScale.rangeBand() * .2;
+                
+                svg.append("line")
+                    .attr("class", "partition")
+                    .attr("x1", partition)
+                    .attr("y1", 0)
+                    .attr("x2", partition)
+                    .attr("y2", height);
 			});
 		</script>
 	</body>

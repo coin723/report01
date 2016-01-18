@@ -96,3 +96,14 @@ svg {
 .index .visible {
     display: block !important;
 }
+
+.partition {
+    stroke: white;
+    stroke-width: 3;
+    stroke-dasharray: 10, 10;
+}
+
+/*
+attr("stroke-dasharray", "10, 10")
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 3);*/
