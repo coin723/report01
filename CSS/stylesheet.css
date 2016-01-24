@@ -49,31 +49,31 @@ svg {
 }
 
 .steamAnth {
-	fill: #FC383D;
+	fill: #7E1C1F;
 }
 
 .steamBitu {
-    fill: #DF5459;
+    fill: #733C3F;
 }
 
 .petroleum {
-    fill: #C27174;
+    fill: #685D5F;
 }
 
 .LNG {
-    fill: #A58D90;
+    fill: #5D7D7F;
 }
 
 .hydroPump {
-    fill: #87AAAC;
+    fill: #519E9F;
 }
 
 .nuclear {
-    fill: #6AC6C8;
+    fill: #46BEBF;
 }
 
 .group {
-    fill: #4DE3E3;
+    fill: #3BDFDF;
 }
 
 .newRenew {
@@ -86,10 +86,18 @@ svg {
     font-size: 20px;
 }
 
-.index g text.rate {
+.index g text {
     fill: #FFFFFF;
     font-family: Ubuntu Medium;
     font-size: 30px;
+    display: none;
+}
+
+.index .description {
+    fill: #FFFFFF;
+    font-family: Ubuntu Bold;
+    font-size: 11px;
+    position: relative;
     display: none;
 }
 
@@ -101,6 +109,12 @@ svg {
     stroke: white;
     stroke-width: 3;
     stroke-dasharray: 10, 10;
+}
+
+rect.mask {
+    opacity: 0.5;
+    fill: #000000;
+    overflow: hidden;
 }
 
 /*

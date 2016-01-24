@@ -250,6 +250,62 @@
                     .attr("dx", indexWidth)
                     .attr("text-anchor", "end");
                 
+                var description = [
+                    "효율이 낮은 석탄을 태움",
+                    "효율이 높은 석탄을 태움",
+                    "석유를 태움",
+                    "천연가스를 태움",
+                    "물의 위치 에너지로 변환된 잉여 전력 공급",
+                    "방사성 고위원소의 핵분열 반응",
+                    "열병합 발전 등으로 일정 지역에 공급",
+                    "태양광, 풍력, 수력 등"
+                ];
+                
+                var newLineCri = [
+                    10,
+                    10,
+                    10,
+                    10,
+                    14,
+                    9,
+                    10,
+                    8
+                ];
+                
+                rects_index.append("text")
+                    .attr("class", "description visible")
+                    .attr("x", indexWidth)
+                    .attr("y", margin.bottom)
+                    .attr("dy", -51)
+                    .attr("width", indexWidth)
+                    .attr("height", "auto")
+                    .attr("text-anchor", "end");
+                
+                var desText = document.querySelectorAll(".index text.description")
+                
+                description.forEach(function(element, index) {
+                    var criterion = newLineCri[index];
+                    var overflow = element.length > criterion;
+                    
+                    if(overflow) {
+                        d3.select(desText[index])
+                            .append("tspan")
+                            .attr("x", indexWidth)
+                            .text(element.substring(0, criterion + 1))
+                            .attr("text-anchor", "end");
+                        
+                        d3.select(desText[index])
+                            .append("tspan")
+                            .attr("x", indexWidth)
+                            .attr("dy", "15")
+                            .text(element.substring(criterion + 1, element.length));
+                    } else {
+                        d3.select(desText[index])
+                            .append("tspan")
+                            .text(element);
+                    }
+                });
+                
                 rects.on("mouseover", function(d) {
                         var currentYear = d3.select(this.parentNode).data();
                     
@@ -266,6 +322,12 @@
                         for(var i = 0; i < texts.length; i++) {
                             texts.item(i).classList.toggle("visible");
                         }
+                    
+                        var texts_desc = document.querySelectorAll(".description");
+                    
+                        for(var i = 0; i < texts_desc.length; i++) {
+                            texts_desc.item(i).classList.remove("visible");
+                        }
                         
                         document.querySelector("g.x g.tick .y" + currentYear).classList.toggle("magnify");
                     })
@@ -276,6 +338,12 @@
 
                         for(var i = 0; i < otherVisible.length; i++) {
                             otherVisible.item(i).classList.toggle("visible");
+                        }
+                    
+                        var texts_desc = document.querySelectorAll(".description");
+                    
+                        for(var i = 0; i < texts_desc.length; i++) {
+                            texts_desc.item(i).classList.add("visible");
                         }
                     
                         document.querySelector("g.x g.tick .y" + currentYear).classList.toggle("magnify");
@@ -382,6 +450,26 @@
                     .attr("y1", 0)
                     .attr("x2", partition)
                     .attr("y2", height);
+                
+                svg.append("rect")
+                    .attr("class", "mask initial")
+                    .attr("width", partition)
+                    .attr("height", height)
+                    .on("mouseover", function() {
+                        console.log(this);
+                        if(this.classList.contains("initial")) {
+                            d3.select(this)
+                                .attr("x", partition)
+                                .attr("width", width - partition);
+                            this.classList.toggle("initial")
+                        } else {
+                            d3.select(this)
+                                .attr("x", 0)
+                                .attr("width", partition);
+                            this.classList.toggle("initial")
+                        }
+                        ;
+                    });
 			});
 		</script>
 	</body>
