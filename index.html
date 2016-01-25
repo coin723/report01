@@ -399,7 +399,7 @@
 //                                }
                             });
                         
-                        
+                        document.querySelector("rect.mask").classList.add("invisible");
                     })
                     .on("mouseout", function(d) {
                         var selector = this.classList.item(0);
@@ -439,6 +439,8 @@
                             
                                 this.classList.remove("invisible");
                             });
+                        
+                        document.querySelector("rect.mask").classList.remove("invisible");
                     });
                 
 //                var partition = (xScale(2015) + xScale(2016)) / 2;
@@ -456,7 +458,6 @@
                     .attr("width", partition)
                     .attr("height", height)
                     .on("mouseover", function() {
-                        console.log(this);
                         if(this.classList.contains("initial")) {
                             d3.select(this)
                                 .attr("x", partition)

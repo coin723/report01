@@ -117,6 +117,10 @@ rect.mask {
     overflow: hidden;
 }
 
+g .invisible {
+    display: none;
+}
+
 /*
 attr("stroke-dasharray", "10, 10")
                     .attr("stroke", "white")
