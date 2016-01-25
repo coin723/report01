@@ -115,11 +115,18 @@ rect.mask {
     opacity: 0.5;
     fill: #000000;
     overflow: hidden;
+    display: none;
 }
 
 g .invisible {
     display: none;
 }
+
+/*
+g.future rect {
+    mask: url(#mask-stripe);
+}
+*/
 
 /*
 attr("stroke-dasharray", "10, 10")
